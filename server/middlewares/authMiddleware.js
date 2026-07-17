@@ -1,3 +1,4 @@
+// Custom Middleware for authentication
 const jwt = require('jsonwebtoken');
 
 // Check if user logged in or not ? (Token check)

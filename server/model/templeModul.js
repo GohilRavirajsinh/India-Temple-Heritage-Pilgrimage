@@ -34,6 +34,10 @@ const templeSchema = new mongoose.Schema({
         type: [String], // Array of strings (Maan lo ek se zyada festivals hain toh list ban jayegi)
         default: []
     },
+    imageUrl: {
+        type: String,
+        default: ""
+    }
 }, {
     timestamps: true // Isse database me automatic "createdAt" aur "updatedAt" ka time save ho jayega
 })

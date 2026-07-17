@@ -19,8 +19,16 @@ const Login = () => {
             if (res.data.success) {
                 localStorage.setItem('token', res.data.token); // ise data broser me store rhega or user refresh krta hai to vo login rhega
                 localStorage.setItem('role', res.data.role);
-                setMessage('Login Succesful! Redirecting...');
-                setTimeout(() => navigate('/'), 1000)
+                setMessage('Login Succesfull');
+
+                const userRole = res.data.role;
+                setTimeout(() => {
+                    if (userRole === 'admin') {
+                        navigate('/admin-dashboard'); // Admin shidha dashboard par jayega jab login krega
+                    } else {
+                        navigate('/'); // User sidha Home page par jayega
+                    }
+                }, 1000)
             }
         } catch (err) {
             setMessage(err.res?.data?.message || 'Login Failed');

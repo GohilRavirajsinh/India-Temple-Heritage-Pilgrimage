@@ -1,27 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
-import Navbar from '../components/Navbar'
 
 const BrowseTemple = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [temples, setTemples] = useState([
-  {
-    _id: "test1",
-    name: "Kedarnath Temple",
-    state: "Uttarakhand",
-    description: "An ancient and majestic Shiva temple located in the Garhwal Himalayan range.",
-    timings: "6:00 AM - 9:00 PM",
-    image: "https://images.unsplash.com/photo-1602643163983-ed0babc39797?w=500"
-  }
-]);
+  ]);
 
   useEffect(() => {
     const fetchTemple = async () => {
       try {
         // hit backend's GET Api
         const res = await axios.get('http://localhost:5000/api/temple-data/all');
-        if (Array.isArray(res.data)) {
+        if (res.data && res.data.data && Array.isArray(res.data.data)) {
+          setTemples(res.data.data);
+        } else if (Array.isArray(res.data)) {
           setTemples(res.data);
         } else if (res.data.temples) {
           setTemples(res.data.temples);
@@ -38,7 +31,6 @@ const BrowseTemple = () => {
 
   return (
     <div className='min-h-screen bg-slate-50'>
-      <Navbar />
 
       <div className='max-w-7xl mx-auto px-4 py-8'>
         <h1 className='text-3xl font-bold text-slate-800 border-b pb-4 mb-8'>
@@ -65,8 +57,8 @@ const BrowseTemple = () => {
             <div key={temple._id} className="bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden hover:shadow-lg transition-shadow">
               {/* Agar database me image URL hai toh dikhao, nahi toh placeholder */}
               <img
-                src={temple.image || 'https://images.unsplash.com/photo-1602643163983-ed0babc39797?w=500'}
-                alt={temple.name}
+                src={temple.imageUrl || 'https://images.unsplash.com/photo-1602643163983-ed0babc39797?w=500'}
+                alt={temple.templeName}
                 className="w-full h-48 object-cover"
               />
               <div className="p-5">
@@ -74,13 +66,13 @@ const BrowseTemple = () => {
                   {temple.state || 'India'}
                 </span>
                 <h3 className="text-xl font-bold text-slate-800 mt-3">
-                  {temple.name}
+                  {temple.templeName}
                 </h3>
                 <p className="text-sm text-slate-600 mt-2 line-clamp-3">
-                  {temple.description || 'Explore the rich history and architecture of this ancient shrine.'}
+                  {temple.history || 'Explore the rich history and architecture of this ancient shrine.'}
                 </p>
                 <div className="mt-5 pt-4 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
-                  <span>🕒 {temple.timings || '6:00 AM - 9:00 PM'}</span>
+                  <span>🕒 {temple.darshanTiming || '6:00 AM - 9:00 PM'}</span>
                   <button className="px-3 py-1.5 bg-slate-800 text-white rounded font-medium hover:bg-slate-900 transition-colors">
                     View Details
                   </button>

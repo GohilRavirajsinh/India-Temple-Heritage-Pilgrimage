@@ -1,4 +1,3 @@
-const { mongo } = require('mongoose');
 const Temple = require('../model/templeModul') // model import
 
 // Nya Function Add Krne ka Function (For Admin)
@@ -14,7 +13,7 @@ exports.addTemple = async (req, res) => {
             data: savedTemple
         })
     } catch (err) {
-        res.status(404).json({
+        res.status(500).json({
             success: false,
             message: "Failed to add temple",
             error: err.message // agar koi field miss huii to error dikhayega
@@ -88,3 +87,5 @@ exports.searchTemples = async (req, res) => {
         });
     }
 };
+
+// Update Temple Data (PUT /api/temples/:id) (For Admin)

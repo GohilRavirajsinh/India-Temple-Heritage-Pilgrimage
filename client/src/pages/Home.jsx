@@ -1,10 +1,11 @@
 import React from 'react'
-import Navbar from '../components/Navbar'
+import { useNavigate } from 'react-router-dom'
 
 const Home = () => {
+    const navigate = useNavigate();
+
     return (
         <div className='min-h-screen bg-slate-50'>
-            <Navbar />
 
             <div className='max-w-4xl mx-auto text-center mt-20 px-4'>
                 <h1 className='text-4xl md:text-5xl font-extrabold text-slate-800 tracking-tight leading-tight'>
@@ -16,7 +17,9 @@ const Home = () => {
                 </p>
 
                 <div className='mt-10 flex justify-center gap-4'>
-                    <button className='px-4 py-3 bg-amber-950 hover:bg-amber-700 text-white hover:text-black rounded-lg shadow transition-all cursor-pointer'>
+                    <button 
+                    onClick={() => navigate('/temples')}
+                    className='px-4 py-3 bg-amber-950 hover:bg-amber-700 text-white hover:text-black rounded-lg shadow transition-all cursor-pointer'>
                         Explore Temples
                     </button>
                 </div>
