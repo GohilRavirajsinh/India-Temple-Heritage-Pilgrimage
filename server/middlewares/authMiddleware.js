@@ -7,7 +7,7 @@ exports.protect = async (req, res, next) => {
         let token;
 
         // Check karo ki kya request ke header me token aaya hai
-        if (req.headers.authorization && req.headers.authorization.startsWith ('Bearer')) {
+        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
             // Header me se 'bearer' hata kar sirf asli token string nikalna
             token = req.headers.authorization.split(' ')[1];
         }

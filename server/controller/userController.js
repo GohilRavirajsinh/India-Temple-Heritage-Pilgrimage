@@ -82,3 +82,59 @@ exports.loginUser = async (req, res) => {
         });
     }
 };
+
+// Update password by user side!
+exports.updatePassword = async (req, res) => {
+    try {
+        
+        // const currentPassword = req.body.currentPassword;
+        // const newPassword = req.body.newPassword;
+        const { currentPassword, newPassword } = req.body // Uper line is Destructure of this line!
+
+        const user = await User.findById(req.user.userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" })
+        }
+
+        // privious password is right or not check it!
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: "Incorrect current password" });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+        await user.save();
+
+        res.status(200).json({ success: true, message: "Password Change Succesfully" });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Server Error", error: err.message})
+    }
+}
+
+// Show All User (For Admin)
+exports.checkUsersByAdmin = async (req, res) => {
+    try {
+        const users = await User.find().select('-password');
+        res.status(200).json({ success: true, data: users});
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Failed to fetch users", error: err.message});
+    }
+};
+
+// Delete any User (DELETE /api/user/:id) (For Admin)
+exports.deleteUsersByAdmin = async (req, res) => {
+    try {
+        const deleteUser = await User.findByIdAndDelete(req.params.id);
+        if (!deleteUser) {
+            return res.status(404).json({ success: false, message: "User not found"});
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "User Deleted By Admin"
+        });
+    } catch (err) {
+        res.status(500).json({ success:false, message:"User Deletion Failed", error: err.message});
+    }
+}

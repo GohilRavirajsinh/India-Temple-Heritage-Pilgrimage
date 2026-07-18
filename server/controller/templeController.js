@@ -3,6 +3,10 @@ const Temple = require('../model/templeModul') // model import
 // Nya Function Add Krne ka Function (For Admin)
 exports.addTemple = async (req, res) => {
     try {
+        if (req.file) {
+            req.body.imageUrl = `/uploads/${req.file.filename}`;
+        }
+        
         // req.body me wo data aayega jo admin form me bharega!
         const newTemple = new Temple(req.body);
         const savedTemple = await newTemple.save(); // Store in Database
@@ -89,3 +93,45 @@ exports.searchTemples = async (req, res) => {
 };
 
 // Update Temple Data (PUT /api/temples/:id) (For Admin)
+exports.updateTemple = async (req, res) => {
+    try {
+        if (req.file) {
+            req.body.imageUrl = `/uploads/${req.file.filename}`;
+        } else {
+            delete req.body.imageUrl;
+        }
+
+        const updatedTemple = await Temple.findByIdAndUpdate(
+            req.params.id, 
+            { $set: req.body }, // Sirf wahi fields badlengi jo request me hain
+            { new: true, runValidators: true }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Temple Updated Successfully",
+            data: updatedTemple
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to update temple",
+            error: err.message
+        });
+    }
+}
+
+// Delete Temple Data (PUT /api/temples/:id) (For Admin)
+exports.deleteTemple = async (req, res) => {
+    try {
+        const pickTemple = await Temple.findByIdAndDelete(req.params.id);
+
+        if (!pickTemple) {
+            return res.status(404).json({ success: false, message: "Temple not found" })
+        }
+
+        res.status(200).json({ success: true, messsage: "Temple Deleted Successfully" })
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Deletion Failed", error: err.message });
+    }
+}

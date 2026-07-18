@@ -57,7 +57,13 @@ const BrowseTemple = () => {
             <div key={temple._id} className="bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden hover:shadow-lg transition-shadow">
               {/* Agar database me image URL hai toh dikhao, nahi toh placeholder */}
               <img
-                src={temple.imageUrl || 'https://images.unsplash.com/photo-1602643163983-ed0babc39797?w=500'}
+                src={
+                  temple.imageUrl
+                    ? (temple.imageUrl.startsWith('http')
+                      ? temple.imageUrl
+                      : `http://localhost:5000${temple.imageUrl}`)
+                    : 'https://images.unsplash.com/photo-1602643163983-ed0babc39797?w=500'
+                }
                 alt={temple.templeName}
                 className="w-full h-48 object-cover"
               />
