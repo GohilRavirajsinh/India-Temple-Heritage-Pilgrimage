@@ -7,11 +7,11 @@ const reviewSchema = new mongoose.Schema({
         ref: 'Temple',
         required: [true, "Review must belong to a temple"]
     },
-    // Review likhne vale ka name
-    reviewerName: {
-        type: String,
-        required: [true, "Reviewer name is required"],
-        trim: true
+    // Review likhne vale ki ID (Logged-in User)
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: [true, "Reviewer must be a registered user"]
     },
     // Star Rating (1 to 5 ke bich)
     rating: {

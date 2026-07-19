@@ -1,4 +1,6 @@
 const Temple = require('../model/templeModul') // model import
+const fs = require('fs');
+const path = require('path');
 
 // Nya Function Add Krne ka Function (For Admin)
 exports.addTemple = async (req, res) => {
@@ -6,7 +8,7 @@ exports.addTemple = async (req, res) => {
         if (req.file) {
             req.body.imageUrl = `/uploads/${req.file.filename}`;
         }
-        
+
         // req.body me wo data aayega jo admin form me bharega!
         const newTemple = new Temple(req.body);
         const savedTemple = await newTemple.save(); // Store in Database
@@ -92,7 +94,7 @@ exports.searchTemples = async (req, res) => {
     }
 };
 
-// Update Temple Data (PUT /api/temples/:id) (For Admin)
+// Update Temple Data (For Admin)
 exports.updateTemple = async (req, res) => {
     try {
         if (req.file) {
@@ -102,7 +104,7 @@ exports.updateTemple = async (req, res) => {
         }
 
         const updatedTemple = await Temple.findByIdAndUpdate(
-            req.params.id, 
+            req.params.id,
             { $set: req.body }, // Sirf wahi fields badlengi jo request me hain
             { new: true, runValidators: true }
         );
@@ -121,16 +123,27 @@ exports.updateTemple = async (req, res) => {
     }
 }
 
-// Delete Temple Data (PUT /api/temples/:id) (For Admin)
+// Delete Temple Data (For Admin)
 exports.deleteTemple = async (req, res) => {
     try {
-        const pickTemple = await Temple.findByIdAndDelete(req.params.id);
+        const pickTemple = await Temple.findById(req.params.id);
 
         if (!pickTemple) {
             return res.status(404).json({ success: false, message: "Temple not found" })
         }
 
-        res.status(200).json({ success: true, messsage: "Temple Deleted Successfully" })
+        // Delete Image from file system if it exists
+        if (pickTemple.imageUrl) {
+            const imagePath = path.join(__dirname, '..', pickTemple.imageUrl);
+            // Check if file exists then delete
+            if (fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath);
+            }
+        }
+
+        await Temple.findByIdAndDelete(req.params.id);
+
+        res.status(200).json({ success: true, messsage: "Temple and its image deleted successfully" })
     } catch (err) {
         res.status(500).json({ success: false, message: "Deletion Failed", error: err.message });
     }

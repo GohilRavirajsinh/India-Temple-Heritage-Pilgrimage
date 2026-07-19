@@ -3,6 +3,9 @@ const Review = require("../model/reviewModel");
 // Review save karne ka logic
 exports.addReview = async (req, res) => {
     try {
+        // Automatically set the userId from the logged in user's token
+        req.body.userId = req.user.userId;
+
         const newReview = new Review(req.body);
         const savedReview = await newReview.save();
 

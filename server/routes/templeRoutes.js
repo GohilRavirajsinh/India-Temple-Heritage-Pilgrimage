@@ -8,7 +8,7 @@ const upload = require('../middlewares/uploadMiddleware')
 router.post('/add', protect, adminOnly, upload.single('imageUrl'), addTemple); // Admin ke liye data add karne ka Route(path)
 router.get('/all', getAllTemple); // User ke liye data dekhne ka Route(path)
 router.get('/search', searchTemples) // Naya Search Route
-router.put('/:id', protect, adminOnly, updateTemple);
+router.put('/:id', protect, adminOnly, upload.single('imageUrl'), updateTemple);
 router.delete('/:id', protect, adminOnly, deleteTemple)
 
 module.exports = router;

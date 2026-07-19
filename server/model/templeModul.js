@@ -34,6 +34,22 @@ const templeSchema = new mongoose.Schema({
         type: [String], // Array of strings (Maan lo ek se zyada festivals hain toh list ban jayegi)
         default: []
     },
+    rituals: {
+        type: String,
+        default: "Information not available"
+    },
+    dressCode: {
+        type: String,
+        default: "Traditional wear recommended"
+    },
+    nearbyFacilities: {
+        type: [String], // Example: ["Hotel", "Bus Stand", "Railway Station"]
+        default: []
+    },
+    isFeatured: {
+        type: Boolean,
+        default: false
+    },
     imageUrl: {
         type: String,
         default: ""
