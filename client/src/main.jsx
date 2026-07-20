@@ -12,11 +12,13 @@ import BrowseTemple from './pages/BrowseTemple'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminRoute from './components/AdminRoute'
 
+import { AuthProvider } from './context/AuthContext'
 
-const router = createBrowserRouter ([
+
+const router = createBrowserRouter([
   {
     path: '/',
-    element: <App/>,
+    element: <App />,
     children: [
       {
         path: '/',
@@ -44,6 +46,8 @@ const router = createBrowserRouter ([
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router}/>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </React.StrictMode>,
 )

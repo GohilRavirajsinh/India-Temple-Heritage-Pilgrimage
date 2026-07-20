@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { AuthContext } from '../context/AuthContext'
 
 const Login = () => {
     const [email, setEmail] = useState('')
@@ -8,6 +9,7 @@ const Login = () => {
     const [message, setMessage] = useState('')
 
     const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -17,8 +19,7 @@ const Login = () => {
             });
 
             if (res.data.success) {
-                localStorage.setItem('token', res.data.token); // ise data broser me store rhega or user refresh krta hai to vo login rhega
-                localStorage.setItem('role', res.data.role);
+                login(res.data.token, res.data.role); // ise data broser me store rhega or user refresh krta hai to vo login rhega
                 setMessage('Login Succesfull');
 
                 const userRole = res.data.role;

@@ -1,27 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 const Navbar = () => {
     const navigate = useNavigate();
-    const location = useLocation(); // ye track krega use kab page badal rha hai.
 
-    // State banayi taaki token badalte hi navbar automatic re-render ho jaye
-    const [token, setToken] = useState(localStorage.getItem('token'));
-    const [role, setRole] = useState(localStorage.getItem('role'));
-
-    // useEffect
-    useEffect (() => {
-        setToken(localStorage.getItem('token'));
-        setRole(localStorage.getItem('role'));
-    }, [location])
-
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
-        setToken(null); // state empty for change button fast
-        setRole(null);
-        navigate('/login');
-    };
+    const { user, logout } = useContext(AuthContext); // Store se 'user' aur 'logout' function nikala
 
     return (
         <nav className="flex justify-between items-center px-8 py-4 bg-slate-800 text-white shadow-md">
@@ -35,14 +19,14 @@ const Navbar = () => {
                     Home
                 </button>
 
-                {token ? (
+                {user ? (
                     // Agar token hai, toh automatic Logout aur Role dikhega
                     <div className="flex items-center gap-4">
                         <span className="bg-slate-700 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-blue-400">
-                            {role || 'User'}
+                            {user.role || 'User'}
                         </span>
-                        <button 
-                            onClick={handleLogout} 
+                        <button
+                            onClick={logout}
                             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded transition-colors"
                         >
                             Logout
@@ -57,7 +41,7 @@ const Navbar = () => {
                         </button>
 
                         <button
-                            onClick={() => navigate('/signIn')}
+                            onClick={() => navigate('/register')}
                             className='px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded transition-colors'
                         >Sign In
                         </button>
