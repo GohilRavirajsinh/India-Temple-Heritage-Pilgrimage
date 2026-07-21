@@ -1,4 +1,21 @@
 @import "tailwindcss";
-.container{
-    background-color:aliceblue;
+
+/* Custom Animations for UI */
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }

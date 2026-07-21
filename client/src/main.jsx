@@ -11,8 +11,8 @@ import Register from './pages/Register'
 import BrowseTemple from './pages/BrowseTemple'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminRoute from './components/AdminRoute'
-
 import { AuthProvider } from './context/AuthContext'
+import TempleDetails from './pages/TempleDetails'
 
 
 const router = createBrowserRouter([
@@ -27,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: '/temples',
         element: <BrowseTemple />
+      },
+      {
+        path: '/temples/:id',
+        element: <TempleDetails />
       },
       {
         path: '/admin-dashboard',

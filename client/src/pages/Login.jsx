@@ -19,15 +19,15 @@ const Login = () => {
             });
 
             if (res.data.success) {
-                login(res.data.token, res.data.role); // ise data broser me store rhega or user refresh krta hai to vo login rhega
-                setMessage('Login Succesfull');
+                login(res.data.token, res.data.role);
+                setMessage('Login Successful!');
 
                 const userRole = res.data.role;
                 setTimeout(() => {
                     if (userRole === 'admin') {
-                        navigate('/admin-dashboard'); // Admin shidha dashboard par jayega jab login krega
+                        navigate('/admin-dashboard');
                     } else {
-                        navigate('/'); // User sidha Home page par jayega
+                        navigate('/');
                     }
                 }, 1000)
             }
@@ -37,47 +37,72 @@ const Login = () => {
     }
 
     return (
-        <div>
-            <div className='min-h-screen bg-slate-50 flex items-center justify-center px-4'>
-                <div className='container max-w-md w-full bg-white p-8 border border-slate-500-100 rounded-lg'>
-                    <h2 className='text-2xl font-bold text-center text-slate-800 mb-6'>Login Account</h2>
+        <div 
+            className="min-h-screen bg-slate-900 flex items-center justify-center px-4 font-sans relative"
+            style={{
+                backgroundImage: "url('https://images.unsplash.com/photo-1514222020963-31fdf792878d?auto=format&fit=crop&w=1920&q=80')",
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+            }}
+        >
+            {/* Dark Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/60 to-slate-900/90 z-0 pointer-events-none"></div>
 
-                    {message && <p className='text-center text-sm font-medium text-red-600 mb-4'>{message}</p>}
-
-                    <form onSubmit={handleSubmit} className='space-y-4'>
-
-                        {/* For email */}
-                        <div>
-                            <label className='block text-sm font-medium text-slate-700'>Email</label>
-
-                            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required />
-                        </div>
-
-                        {/* For password */}
-                        <div>
-                            <label className='block text-sm font-medium text-slate-700'>Password</label>
-
-                            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required />
-                        </div>
-
-                        {/* For Login button */}
-                        <button type='submit' className='w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md shadow transition-colors cursor-pointer'>
-                            Login
-                        </button>
-
-                    </form>
-
-                    {/* For Already have an account? */}
-                    <p className='mt-6 text-sm text-center text-slate-600'>
-                        Already have an account?{' '}
-                        <span onClick={() => navigate('/login')} className='text-blue-600 font-medium cursor-pointer hover:underline'>
-                            Login here
-                        </span>
-                    </p>
+            <div className='relative z-10 w-full max-w-md bg-white/10 backdrop-blur-xl p-10 border border-white/20 rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.6)]'>
+                
+                <div className="text-center mb-8">
+                    <span className="bg-orange-500/20 text-orange-400 border border-orange-500/30 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest inline-block mb-3">Welcome Back</span>
+                    <h2 className='text-3xl font-extrabold text-white tracking-tight'>Sign In</h2>
                 </div>
+
+                {message && (
+                    <div className={`text-center text-sm font-bold py-3 rounded-lg mb-6 ${message.includes('Success') ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
+                        {message}
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit} className='space-y-6'>
+                    <div>
+                        <label className='block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2'>Email Address</label>
+                        <input 
+                            type="email" 
+                            value={email} 
+                            onChange={(e) => setEmail(e.target.value)} 
+                            className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all" 
+                            placeholder="you@example.com"
+                            required 
+                        />
+                    </div>
+
+                    <div>
+                        <label className='block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2'>Password</label>
+                        <input 
+                            type="password" 
+                            value={password} 
+                            onChange={(e) => setPassword(e.target.value)} 
+                            className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all" 
+                            placeholder="••••••••"
+                            required 
+                        />
+                    </div>
+
+                    <button 
+                        type='submit' 
+                        className='w-full py-4 bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(249,115,22,0.4)] hover:shadow-[0_0_25px_rgba(249,115,22,0.6)] transition-all duration-300 tracking-wide mt-4'
+                    >
+                        Secure Login
+                    </button>
+                </form>
+
+                <p className='mt-8 text-sm text-center text-slate-400'>
+                    Don't have an account?{' '}
+                    <span onClick={() => navigate('/register')} className='text-orange-400 font-bold cursor-pointer hover:text-orange-300 transition-colors border-b border-transparent hover:border-orange-300'>
+                        Create one here
+                    </span>
+                </p>
             </div>
         </div>
     )
 }
 
-export default Login
+export default Login;

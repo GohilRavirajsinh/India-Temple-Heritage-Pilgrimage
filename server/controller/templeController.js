@@ -49,14 +49,25 @@ exports.getAllTemple = async (req, res) => {
 exports.searchTemples = async (req, res) => {
     try {
         // erq.query ka matlab hai URL se search keywords uthana (?state=Gujarat)
-        const { state, city, deity, sort, page, limit } = req.query;
+        const { state, city, deity, query, sort, page, limit } = req.query;
 
         let queryObj = {}; // empty object jisme filters dalenge. 
 
         // FILTERING LOGIC
-        if (state) queryObj.state = { $regex: String(state).trim(), $options: 'i' };
-        if (city) queryObj.city = { $regex: String(city).trim(), $options: 'i' };
-        if (deity) queryObj.deity = { $regex: String(deity).trim(), $options: 'i' };
+        if (query) {
+            queryObj = {
+                $or: [
+                    { templeName: { $regex: String(query).trim(), $options: 'i' } },
+                    { state: { $regex: String(query).trim(), $options: 'i' } },
+                    { city: { $regex: String(query).trim(), $options: 'i' } },
+                    { deity: { $regex: String(query).trim(), $options: 'i' } }
+                ]
+            };
+        } else {
+            if (state) queryObj.state = { $regex: String(state).trim(), $options: 'i' };
+            if (city) queryObj.city = { $regex: String(city).trim(), $options: 'i' };
+            if (deity) queryObj.deity = { $regex: String(deity).trim(), $options: 'i' };
+        }
 
         // Mongoose query ko pehle variable me hold karenge bina execute kiye
         let mongooseQuery = Temple.find(queryObj);
@@ -148,3 +159,24 @@ exports.deleteTemple = async (req, res) => {
         res.status(500).json({ success: false, message: "Deletion Failed", error: err.message });
     }
 }
+
+exports.getSingleTemple = async (req, res) => {
+    try {
+        const temple = await Temple.findById(req.params.id);
+        
+        if (!temple) {
+            return res.status(404).json({ success: false, message: "Temple not found" });
+        }
+        
+        res.status(200).json({
+            success: true,
+            data: temple
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch temple details",
+            error: err.message
+        });
+    }
+};
