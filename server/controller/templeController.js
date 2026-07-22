@@ -180,3 +180,42 @@ exports.getSingleTemple = async (req, res) => {
         });
     }
 };
+
+// Add Review
+exports.addReview = async (req, res) => {
+    try {
+        const {rating, comment} = res.body;
+        const temple = await Temple.findById(req.params.id);
+
+        if (!temple) return res.status(404).json({
+            message: "Temple not found"
+        })
+
+        // Check if user already reviewed
+        const alreadyReviewed = temple.reviews.find(r => r.user.toString() === req.user._id.toString());
+
+        if (alreadyReviewed) return
+        res.status(400).json({
+            message: "You are already reviewed this temple"
+        });
+
+        const review = {
+            user: req.user._id,
+            name: req.user.name,
+            rating: Number(rating),
+            comment
+        };
+
+        temple.reviews.push(review);
+        await temple.save();
+
+        res.status(201).json({
+            message: "Review Added Succesfully", temple
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: "server error",
+            error: err.message
+        });
+    }
+}

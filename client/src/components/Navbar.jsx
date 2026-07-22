@@ -56,12 +56,12 @@ const Navbar = () => {
                                 Admin Portal
                             </button>
                         )}
-                        
-                        <div className="flex flex-col text-right hidden sm:block">
-                            <span className="text-xs text-slate-400 uppercase tracking-widest">Logged in as</span>
+
+                        <div className="hidden sm:flex flex-col text-right">
+                            <span className="text-xs text-slate-400 uppercase tracking-widest">Logged in as </span>
                             <span className="text-sm font-bold text-amber-200 capitalize">{user.role || 'User'}</span>
                         </div>
-                        
+
                         <button
                             onClick={() => {
                                 logout();

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { addTemple, getAllTemple, searchTemples, updateTemple, deleteTemple, getSingleTemple } = require('../controller/templeController');
+const { addTemple, getAllTemple, searchTemples, updateTemple, deleteTemple, getSingleTemple, addReview } = require('../controller/templeController');
 const { protect, adminOnly } = require('../middlewares/authMiddleware');
 const upload = require('../middlewares/uploadMiddleware')
 // Controller ke dono function ko import kiya
@@ -11,5 +11,6 @@ router.get('/search', searchTemples) // Naya Search Route
 router.put('/:id', protect, adminOnly, upload.single('imageUrl'), updateTemple);
 router.delete('/:id', protect, adminOnly, deleteTemple)
 router.get('/:id', getSingleTemple);
+router.post('/:id/reviews', protect, addReview) // User logged in hona chahiye (protect)
 
 module.exports = router;

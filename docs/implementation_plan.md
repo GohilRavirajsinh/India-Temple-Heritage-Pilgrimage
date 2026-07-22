@@ -1,209 +1,125 @@
-# 🗑️ Naya Feature: Admin Portal - Delete Temples
+# ⭐ Phase 2: Review & Rating System (Frontend UI)
 
-Bhai, humari app ka **Admin Dashboard** mandir add toh kar leta hai, par agar galti se koi galat data add ho gaya, toh Admin ke paas usko Delete karne ka option hona chahiye na?
+Bhai, Backend (Database API) ready hai (reviews array aur addReview API). Ab humein sirf Frontend (`TempleDetails.jsx`) me changes karne hain jisse Review Form aur logo ke diye gaye reviews dikhe.
 
-Backend me humne pehle se hi **Delete API** (`router.delete('/:id')`) banakar rakhi hai. Ab humein Frontend (Admin Dashboard) me ek list banani hai jahan Admin sabhi temples dekh sake aur unhe Delete kar sake.
+Apni file **`client/src/pages/TempleDetails.jsx`** kholiye aur neeche diye gaye exact lines par ye code replace/add kijiye:
 
 ---
 
-## Step 1: `AdminDashboard.jsx` ko update karna
-
-Apni file `client/src/pages/AdminDashboard.jsx` kholiye. 
-Saara purana code delete kar dijiye aur ye naya code Paste kijiye:
-
+### 1. Line 1 se 3 (Imports Update Karein)
+In lines ko mitakar ye naya code daaliye:
 ```jsx
-import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import React, { useEffect, useState, useContext } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
+```
 
-const AdminDashboard = () => {
-    // FORM STATE
-    const [formData, setFormData] = useState({
-        templeName: '', state: '', city: '', deity: '', history: '',
-        darshanTiming: '', imageUrl: null, rituals: '', dressCode: '',
-        nearbyFacilities: '', isFeatured: false
-    });
+---
 
-    const [loading, setLoading] = useState(false)
-    const [message, setMessage] = useState('');
-    const [error, setError] = useState('');
+### 2. Line 6 se 9 (Variables Update Karein)
+In lines ko mitakar ye naya code daaliye:
+```jsx
+    const { id } = useParams(); 
+    const navigate = useNavigate();
+    const { user } = useContext(AuthContext);
 
-    // 🌟 NAYA: Temples ki list save karne ke liye state
-    const [temples, setTemples] = useState([]);
-    const [activeTab, setActiveTab] = useState('add'); // 'add' ya 'manage'
+    const [temple, setTemple] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    // 🌟 NAYA: Jab bhi "Manage" tab khule, saare temples backend se le aao
-    const fetchTemples = async () => {
+    const [rating, setRating] = useState(5);
+    const [comment, setComment] = useState('');
+    const [reviewMessage, setReviewMessage] = useState('');
+```
+
+---
+
+### 3. Line 11 se 23 (`useEffect` ko replace karke Submit Function daalein)
+Is poore block ko mitakar ye naya code daaliye:
+```jsx
+    const fetchSingleTemple = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/temple-data/all');
-            setTemples(res.data.data || []);
-        } catch (err) {
-            console.error("Failed to fetch temples");
+            const res = await axios.get(`http://localhost:5000/api/temple-data/${id}`);
+            setTemple(res.data.data);
+            setLoading(false);
+        } catch (error) {
+            console.error("Temple load hone me error aayi", error);
+            setLoading(false);
         }
     };
 
     useEffect(() => {
-        if (activeTab === 'manage') {
-            fetchTemples();
-        }
-    }, [activeTab]);
+        fetchSingleTemple();
+    }, [id]);
 
-    // 🌟 NAYA: Mandir Delete karne ka function
-    const handleDelete = async (id) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this temple? This action cannot be undone.");
-        if (!confirmDelete) return;
-
+    const submitReview = async (e) => {
+        e.preventDefault();
+        setReviewMessage('');
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:5000/api/temple-data/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            
-            // Delete hone ke baad list ko update karo
-            setTemples(temples.filter(temple => temple._id !== id));
-            setMessage("Temple deleted successfully!");
-            setTimeout(() => setMessage(''), 3000);
+            await axios.post(`http://localhost:5000/api/temple-data/${id}/reviews`, 
+                { rating, comment }, 
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setReviewMessage('Review added successfully! 🎉');
+            setComment(''); setRating(5);
+            fetchSingleTemple();
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to delete temple');
+            setReviewMessage(err.response?.data?.message || 'Failed to submit review');
         }
     };
+```
 
-    // FORM HANDLING FUNCTIONS (Purane wale hi hain)
-    const handleChange = (e) => {
-        if (e.target.name === 'imageUrl') {
-            setFormData({ ...formData, imageUrl: e.target.files[0] });
-        } else if (e.target.type === 'checkbox') {
-            setFormData({ ...formData, [e.target.name]: e.target.checked });
-        } else {
-            setFormData({ ...formData, [e.target.name]: e.target.value });
-        }
-    };
+---
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true); setMessage(''); setError('');
-        const token = localStorage.getItem('token');
+### 4. Line 46 (Image par Fallback Lagayein)
+Jahan `<img` tag hai, usme `alt={temple.templeName}` ke theek neeche ye line add kijiye:
+```jsx
+                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1623910271032-15f10b7f078e?auto=format&fit=crop&q=80&w=1200'; }}
+```
 
-        try {
-            const dataToSubmit = new FormData();
-            dataToSubmit.append('templeName', formData.templeName);
-            dataToSubmit.append('state', formData.state);
-            dataToSubmit.append('city', formData.city);
-            dataToSubmit.append('deity', formData.deity);
-            dataToSubmit.append('history', formData.history);
-            dataToSubmit.append('darshanTiming', formData.darshanTiming);
-            dataToSubmit.append('rituals', formData.rituals);
-            dataToSubmit.append('dressCode', formData.dressCode);
-            const facilitiesArray = formData.nearbyFacilities.split(',').map(f => f.trim()).filter(f => f);
-            facilitiesArray.forEach(f => dataToSubmit.append('nearbyFacilities[]', f));
-            dataToSubmit.append('isFeatured', formData.isFeatured);
-            if (formData.imageUrl) dataToSubmit.append('imageUrl', formData.imageUrl);
+---
 
-            await axios.post('http://localhost:5000/api/temple-data/add', dataToSubmit, {
-                headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
-            });
+### 5. Line 122 (Review UI Design daaliye)
+Aapke code me **Line 122 aur 123 ke beech me** (matlab `Details Grid` khatam hone ke theek baad) ye poora naya code daaliye:
 
-            setMessage('Temple added successfully to the database!');
-            setFormData({ templeName: '', state: '', city: '', deity: '', history: '', darshanTiming: '', imageUrl: null, rituals: '', dressCode: '', nearbyFacilities: '', isFeatured: false })
-        } catch (err) {
-            setError(err.response?.data?.message || 'Failed to add temple data.');
-        } finally {
-            setLoading(false);
-        };
-    }
-
-    return (
-        <div className="min-h-screen bg-slate-900 pt-28 pb-20 px-4 font-sans">
-            <div className="max-w-5xl mx-auto">
-                <div className="bg-white/5 backdrop-blur-xl rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden">
-                    
-                    {/* TABS (🌟 NAYA UI) */}
-                    <div className="flex border-b border-white/10">
-                        <button 
-                            onClick={() => setActiveTab('add')}
-                            className={`flex-1 py-5 font-bold tracking-widest uppercase transition-all ${activeTab === 'add' ? 'bg-orange-500/20 text-orange-400 border-b-2 border-orange-500' : 'text-slate-400 hover:bg-white/5'}`}
-                        >
-                            ➕ Add New Temple
-                        </button>
-                        <button 
-                            onClick={() => setActiveTab('manage')}
-                            className={`flex-1 py-5 font-bold tracking-widest uppercase transition-all ${activeTab === 'manage' ? 'bg-orange-500/20 text-orange-400 border-b-2 border-orange-500' : 'text-slate-400 hover:bg-white/5'}`}
-                        >
-                            ⚙️ Manage Temples
-                        </button>
-                    </div>
-
-                    <div className="p-8 md:p-12">
-                        {/* Status Messages */}
-                        {message && <div className="p-4 mb-8 bg-green-500/20 text-green-400 font-bold rounded-xl border border-green-500/30 text-center tracking-wide">{message}</div>}
-                        {error && <div className="p-4 mb-8 bg-red-500/20 text-red-400 font-bold rounded-xl border border-red-500/30 text-center tracking-wide">{error}</div>}
-
-                        {/* ===================== TAB 1: ADD TEMPLE ===================== */}
-                        {activeTab === 'add' && (
-                            <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in">
-                                {/* PURANA FORM UI (Wahi same code) */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div><label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Temple Name *</label><input type="text" name="templeName" value={formData.templeName} onChange={handleChange} required className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50" /></div>
-                                    <div><label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">State *</label><input type="text" name="state" value={formData.state} onChange={handleChange} required className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50" /></div>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div><label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">City *</label><input type="text" name="city" value={formData.city} onChange={handleChange} required className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50" /></div>
-                                    <div><label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Deity *</label><input type="text" name="deity" value={formData.deity} onChange={handleChange} required className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50" /></div>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
-                                    <div className="md:col-span-1"><label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Upload Image</label><input type="file" name="imageUrl" accept="image/*" onChange={handleChange} className="w-full px-4 py-2 border border-white/10 bg-slate-900/50 rounded-xl text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-orange-500/20 file:text-orange-400 hover:file:bg-orange-500/30 transition-all" /></div>
-                                </div>
-                                <div><label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Historical Description *</label><textarea name="history" value={formData.history} onChange={handleChange} required rows="3" className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 resize-none"></textarea></div>
-                                
-                                <button type="submit" disabled={loading} className="w-full py-4 mt-4 bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(249,115,22,0.4)] tracking-wider">
-                                    {loading ? 'Adding Shrine...' : '✨ Publish Shrine'}
-                                </button>
-                            </form>
-                        )}
-
-                        {/* ===================== TAB 2: MANAGE TEMPLES (NAYA) ===================== */}
-                        {activeTab === 'manage' && (
-                            <div className="animate-fade-in">
-                                {temples.length === 0 ? (
-                                    <p className="text-center text-slate-400 py-10">No temples found in the database.</p>
-                                ) : (
-                                    <div className="space-y-4">
-                                        {temples.map((temple) => (
-                                            <div key={temple._id} className="flex flex-col md:flex-row justify-between items-center bg-slate-900/50 p-4 border border-white/10 rounded-xl hover:border-orange-500/30 transition-all">
-                                                <div className="flex items-center gap-4 w-full md:w-auto">
-                                                    <img 
-                                                        src={temple.imageUrl ? (temple.imageUrl.startsWith('http') ? temple.imageUrl : `http://localhost:5000${temple.imageUrl}`) : 'https://images.unsplash.com/photo-1623910271032-15f10b7f078e?w=100'} 
-                                                        className="w-16 h-16 object-cover rounded-lg border border-white/10"
-                                                        alt={temple.templeName}
-                                                    />
-                                                    <div>
-                                                        <h4 className="font-bold text-white">{temple.templeName}</h4>
-                                                        <p className="text-xs text-slate-400 uppercase tracking-widest">{temple.state}, {temple.city}</p>
-                                                    </div>
-                                                </div>
-                                                
-                                                <div className="mt-4 md:mt-0 flex gap-3 w-full md:w-auto">
-                                                    <button 
-                                                        onClick={() => handleDelete(temple._id)}
-                                                        className="flex-1 md:flex-none px-4 py-2 bg-red-500/10 hover:bg-red-500/30 text-red-400 border border-red-500/30 rounded-lg text-sm font-bold uppercase tracking-widest transition-all"
-                                                    >
-                                                        🗑️ Delete
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
+```jsx
+                        {/* REVIEWS SECTION */}
+                        <div className="mt-12 pt-12 border-t border-white/10">
+                            <h3 className="text-3xl font-extrabold text-white mb-8 tracking-wide">Community Reviews</h3>
+                            
+                            {user ? (
+                                <form onSubmit={submitReview} className="bg-white/5 p-6 md:p-8 rounded-2xl border border-white/10 mb-10 shadow-lg">
+                                    <h4 className="text-lg font-bold text-orange-400 mb-6 uppercase tracking-widest">Share your experience</h4>
+                                    {reviewMessage && <div className="mb-4 p-3 bg-green-500/20 text-green-400 border border-green-500/30 rounded-lg text-sm font-bold">{reviewMessage}</div>}
+                                    <div className="mb-6">
+                                        <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Rating</label>
+                                        <select value={rating} onChange={(e) => setRating(Number(e.target.value))} className="w-full md:w-48 px-4 py-3 bg-slate-900/80 border border-white/10 rounded-xl text-amber-400 font-bold focus:outline-none focus:border-orange-500/50">
+                                            <option value={5}>⭐⭐⭐⭐⭐ (5/5)</option><option value={4}>⭐⭐⭐⭐ (4/5)</option><option value={3}>⭐⭐⭐ (3/5)</option><option value={2}>⭐⭐ (2/5)</option><option value={1}>⭐ (1/5)</option>
+                                        </select>
                                     </div>
-                                )}
-                            </div>
-                        )}
-                        
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
+                                    <div className="mb-6">
+                                        <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Your Thoughts</label>
+                                        <textarea value={comment} onChange={(e) => setComment(e.target.value)} required rows="3" placeholder="Write about the peace, architecture..." className="w-full px-4 py-3 bg-slate-900/80 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-orange-500/50 resize-none"></textarea>
+                                    </div>
+                                    <button type="submit" className="px-8 py-3 bg-gradient-to-r from-orange-600 to-amber-500 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(249,115,22,0.4)]">Post Review</button>
+                                </form>
+                            ) : (
+                                <div className="bg-orange-900/20 p-8 rounded-2xl text-center mb-10">
+                                    <p className="text-slate-400 mb-6">Please log in to share your spiritual experience.</p>
+                                    <button onClick={() => navigate('/login')} className="px-8 py-3 bg-white/10 hover:bg-orange-500/20 text-white font-bold rounded-xl border border-white/20 hover:border-orange-500/50">Login to Review</button>
+                                </div>
+                            )}
 
-export default AdminDashboard;
+                            <div className="space-y-6">
+                                {temple.reviews && temple.reviews.length > 0 ? temple.reviews.map((rev, index) => (
+                                    <div key={index} className="bg-slate-900/50 p-6 rounded-2xl border border-white/5">
+                                        <h5 className="font-bold text-white text-lg capitalize">{rev.name} <span className="text-amber-400 text-sm ml-2">{"★".repeat(rev.rating)}</span></h5>
+                                        <p className="text-slate-300 italic mt-2">"{rev.comment}"</p>
+                                    </div>
+                                )) : <p className="text-slate-400 text-center">No reviews yet. Be the first!</p>}
+                            </div>
+                        </div>
 ```
 
 Aap bas is code ko copy karke `AdminDashboard.jsx` mein paste karein aur Admin panel khol kar dekhein! Wahan apko Tab wala layout dikhega!
