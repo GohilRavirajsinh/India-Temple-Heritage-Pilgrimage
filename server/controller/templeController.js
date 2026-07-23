@@ -184,24 +184,25 @@ exports.getSingleTemple = async (req, res) => {
 // Add Review
 exports.addReview = async (req, res) => {
     try {
-        const {rating, comment} = res.body;
+        const { rating, comment } = req.body; // Fix 1: was res.body (typo)
         const temple = await Temple.findById(req.params.id);
+        const User = require('../model/userModel'); // Model import to fetch name
 
-        if (!temple) return res.status(404).json({
-            message: "Temple not found"
-        })
+        if (!temple) return res.status(404).json({ message: "Temple not found" });
 
-        // Check if user already reviewed
-        const alreadyReviewed = temple.reviews.find(r => r.user.toString() === req.user._id.toString());
+        const reviewUser = await User.findById(req.user.userId);
+        if (!reviewUser) return res.status(404).json({ message: "User not found" });
 
-        if (alreadyReviewed) return
-        res.status(400).json({
-            message: "You are already reviewed this temple"
-        });
+        // Fix 2: token payload has 'userId' not '_id'
+        const alreadyReviewed = temple.reviews.find(r => r.user.toString() === req.user.userId.toString());
+
+        if (alreadyReviewed) {
+            return res.status(400).json({ message: "You have already reviewed this temple" });
+        }
 
         const review = {
-            user: req.user._id,
-            name: req.user.name,
+            user: req.user.userId, 
+            name: reviewUser.name, // Fetch real name from database
             rating: Number(rating),
             comment
         };
@@ -210,11 +211,12 @@ exports.addReview = async (req, res) => {
         await temple.save();
 
         res.status(201).json({
-            message: "Review Added Succesfully", temple
+            message: "Review Added Successfully",
+            data: temple
         });
     } catch (err) {
         res.status(500).json({
-            message: "server error",
+            message: "Server error",
             error: err.message
         });
     }

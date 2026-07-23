@@ -19,7 +19,7 @@ const Login = () => {
             });
 
             if (res.data.success) {
-                login(res.data.token, res.data.role);
+                login(res.data.token, res.data.role, res.data.name);
                 setMessage('Login Successful!');
 
                 const userRole = res.data.role;

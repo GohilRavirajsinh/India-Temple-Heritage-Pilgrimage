@@ -13,6 +13,8 @@ import AdminDashboard from './pages/AdminDashboard'
 import AdminRoute from './components/AdminRoute'
 import { AuthProvider } from './context/AuthContext'
 import TempleDetails from './pages/TempleDetails'
+import NotFound from './pages/NotFound'
+import UserProfile from './pages/UserProfile'
 
 
 const router = createBrowserRouter([
@@ -34,7 +36,11 @@ const router = createBrowserRouter([
       },
       {
         path: '/admin-dashboard',
-        element: <AdminRoute><AdminDashboard /></AdminRoute> // for use as a children AdminDashboard
+        element: <AdminRoute><AdminDashboard /></AdminRoute>
+      },
+      {
+        path: '/profile',
+        element: <UserProfile />
       },
     ]
   },
@@ -45,6 +51,10 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <Register />
+  },
+  {
+    path: '*',
+    element: <NotFound />
   }
 ])
 

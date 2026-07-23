@@ -57,10 +57,11 @@ const Navbar = () => {
                             </button>
                         )}
 
-                        <div className="hidden sm:flex flex-col text-right">
-                            <span className="text-xs text-slate-400 uppercase tracking-widest">Logged in as </span>
-                            <span className="text-sm font-bold text-amber-200 capitalize">{user.role || 'User'}</span>
-                        </div>
+                        <button onClick={() => navigate('/profile')}
+                            className="hidden sm:flex flex-col text-right hover:opacity-80 transition-opacity">
+                            <span className="text-xs text-slate-400 uppercase tracking-widest">Welcome,</span>
+                            <span className="text-sm font-bold text-amber-200 capitalize">{user.name || user.role}</span>
+                        </button>
 
                         <button
                             onClick={() => {
