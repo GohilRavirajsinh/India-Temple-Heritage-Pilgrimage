@@ -50,5 +50,3 @@ Built using the **MERN** stack (MongoDB, Express, React, Node.js).
    ```
 
 ---
-*Development Note:*
-> **Admin Token:** `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTRhMjI0ZmU3ZjMzMGQyMTIxZTgzY2IiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODQyOTI4MTMsImV4cCI6MTc4NDM3OTIxM30.cVKADrEtvoTMK1lpAWO4r1tgjoMtqUdUndrH-qWRubs`
