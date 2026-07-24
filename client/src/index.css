@@ -1,62 +1,112 @@
 @import "tailwindcss";
 
-/* Custom Animations */
-.animate-marquee {
-  display: flex;
-  width: max-content;
-  animation: marquee 40s linear infinite;
+/*
+  ============================================================
+  PHASE 1 CHANGE: Heritage Design System via Tailwind v4 @theme
+  ============================================================
+  In Tailwind v4, custom design tokens are defined directly in CSS
+  using the @theme directive — there is no tailwind.config.js needed.
+  These CSS custom properties become available as Tailwind utility classes.
+  e.g. `bg-heritage-bg`, `text-heritage-primary`, `font-serif-display`
+*/
+@theme {
+  /* --- Color Palette: Warm, Sacred Heritage --- */
+  --color-heritage-bg: #FDF6E9;        /* Warm ivory — main app background */
+  --color-heritage-surface: #FFFDF8;   /* Slightly lighter cream — cards & panels */
+  --color-heritage-border: #E8D5B5;    /* Warm beige — borders & dividers */
+  --color-heritage-primary: #7B1E3A;   /* Deep maroon — CTAs, highlights */
+  --color-heritage-primary-hover: #9A2448; /* Slightly lighter for hover states */
+  --color-heritage-accent: #C89030;    /* Muted saffron/gold — active states, badges */
+  --color-heritage-accent-light: #F5E6B8; /* Light saffron — subtle backgrounds */
+  --color-heritage-text: #2D2422;      /* Deep charcoal-brown — primary text */
+  --color-heritage-muted: #8A6F5E;     /* Muted brownish-gray — secondary text */
+  --color-heritage-dark: #1A0F0A;      /* Near-black brown — footer, dark sections */
+
+  /* --- Font Families --- */
+  --font-family-serif-display: 'Playfair Display', Georgia, serif;
+  --font-family-sans-body: 'Poppins', system-ui, sans-serif;
 }
 
-.animate-marquee:hover {
-  animation-play-state: paused;
+/*
+  PHASE 1 CHANGE: Global base styles applied to every element.
+  Sets the warm ivory background, charcoal text, and Poppins as the default
+  body font. The font-sans-body variable feeds from @theme above.
+*/
+html, body, #root {
+  background-color: #FDF6E9;
+  color: #2D2422;
+  font-family: 'Poppins', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+/*
+  PHASE 1 CHANGE: Utility class for Playfair Display headings.
+  Any element with class 'font-serif-display' will use the elegant serif font.
+*/
+.font-serif-display {
+  font-family: 'Playfair Display', Georgia, serif;
 }
 
-/* Fade In */
+/* ============================================================
+   PRESERVED ANIMATIONS — All existing animations kept intact,
+   but updated to use the new warm heritage color palette.
+   ============================================================ */
+
+
+/* Fade In Up — for page load reveals */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
 .animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out forwards;
+  animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* Glow pulse */
+/*
+  NEW ANIMATION: staggered fade-ins for list items.
+  Add delay-100, delay-200 etc. alongside animate-fade-in-up for sequence effect.
+*/
+.animate-fade-in-up.delay-100 { animation-delay: 0.1s; opacity: 0; }
+.animate-fade-in-up.delay-200 { animation-delay: 0.2s; opacity: 0; }
+.animate-fade-in-up.delay-300 { animation-delay: 0.3s; opacity: 0; }
+.animate-fade-in-up.delay-400 { animation-delay: 0.4s; opacity: 0; }
+
+/* Glow Pulse — UPDATED to heritage maroon glow instead of orange */
 @keyframes glowPulse {
-  0%, 100% { box-shadow: 0 0 15px rgba(249,115,22,0.3); }
-  50% { box-shadow: 0 0 35px rgba(249,115,22,0.7); }
+  0%, 100% { box-shadow: 0 0 15px rgba(123, 30, 58, 0.3); }
+  50%       { box-shadow: 0 0 35px rgba(123, 30, 58, 0.6); }
 }
-
 .animate-glow-pulse {
   animation: glowPulse 2.5s ease-in-out infinite;
 }
 
-/* Shimmer (skeleton loader) */
+/* Shimmer — UPDATED for warm ivory skeleton loaders */
 @keyframes shimmer {
-  0% { background-position: -1000px 0; }
-  100% { background-position: 1000px 0; }
+  0%   { background-position: -1000px 0; }
+  100% { background-position:  1000px 0; }
 }
-
 .animate-shimmer {
-  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+  /* CHANGED: warm beige shimmer instead of cold white/transparent */
+  background: linear-gradient(
+    90deg,
+    rgba(232, 213, 181, 0.4) 25%,
+    rgba(245, 230, 184, 0.7) 50%,
+    rgba(232, 213, 181, 0.4) 75%
+  );
   background-size: 1000px 100%;
-  animation: shimmer 2s infinite linear;
+  animation: shimmer 1.8s infinite linear;
 }
 
-/* Gradient text animation */
+/* Gradient text animation — UPDATED to heritage maroon/saffron */
 @keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
 }
-
 .animate-gradient-text {
-  background: linear-gradient(270deg, #f97316, #fbbf24, #f97316);
+  /* CHANGED: maroon → saffron → maroon gradient instead of orange shades */
+  background: linear-gradient(270deg, #7B1E3A, #C89030, #7B1E3A);
   background-size: 200% 200%;
   animation: gradientShift 4s ease infinite;
   -webkit-background-clip: text;
@@ -64,22 +114,71 @@
   background-clip: text;
 }
 
-/* Float animation */
+/* Float animation — kept identical */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  50%       { transform: translateY(-10px); }
 }
-
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
 
-/* Scroll indicator */
+/* Slow bounce — kept identical */
 @keyframes bounce-slow {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(8px); }
+  50%       { transform: translateY(8px); }
 }
-
 .animate-bounce-slow {
   animation: bounce-slow 2s ease-in-out infinite;
 }
+
+/*
+  NEW: Heritage card hover effect.
+  A reusable class for the gentle lift + warm shadow on temple cards.
+  How it works: transition smoothly moves the card up by 4px and adds
+  a warm maroon-tinted shadow underneath, giving a "rising" feel.
+*/
+.heritage-card-hover {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.heritage-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(123, 30, 58, 0.12),
+              0 4px 12px rgba(123, 30, 58, 0.08);
+}
+
+/*
+  NEW: Count-up animation utility.
+  Used on stats numbers in the Hero section for a subtle scale-in pop.
+*/
+@keyframes countUp {
+  from { opacity: 0; transform: scale(0.7); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.animate-count-up {
+  animation: countUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/*
+  NEW: Heritage divider line.
+  A decorative horizontal rule with a saffron-to-transparent gradient.
+*/
+.heritage-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #C89030, transparent);
+  border: none;
+  opacity: 0.5;
+}
+
+/*
+  NEW: Scrollbar styling to match the heritage palette.
+  Makes the scrollbar blend with the warm ivory background.
+*/
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #FDF6E9; }
+::-webkit-scrollbar-thumb {
+  background: #C89030;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: #7B1E3A; }

@@ -3,9 +3,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const INDIAN_STATES = [
-    'All', 'Gujarat', 'Uttar Pradesh', 'Tamil Nadu', 'Rajasthan', 'Maharashtra',
-    'Karnataka', 'Andhra Pradesh', 'Odisha', 'West Bengal', 'Madhya Pradesh',
-    'Kerala', 'Uttarakhand', 'Bihar', 'Himachal Pradesh'
+    'Gujarat', 'Uttar Pradesh', 'Rajasthan', 'Maharashtra',
+    'Karnataka', 'Odisha', 'Uttarakhand', 'Himachal Pradesh'
 ];
 
 const BrowseTemple = () => {
@@ -116,11 +115,10 @@ const BrowseTemple = () => {
                         <button
                             key={state}
                             onClick={() => handleStateFilter(state)}
-                            className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border transition-all ${
-                                activeState === state
-                                    ? 'bg-orange-500 border-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]'
-                                    : 'bg-white/5 border-white/10 text-slate-300 hover:border-orange-500/50 hover:text-orange-400'
-                            }`}
+                            className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border transition-all ${activeState === state
+                                ? 'bg-orange-500 border-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]'
+                                : 'bg-white/5 border-white/10 text-slate-300 hover:border-orange-500/50 hover:text-orange-400'
+                                }`}
                         >
                             {state}
                         </button>
@@ -169,12 +167,6 @@ const BrowseTemple = () => {
                                         </span>
                                     )}
 
-                                    {/* Reviews count */}
-                                    {temple.reviews && temple.reviews.length > 0 && (
-                                        <span className="absolute top-3 left-3 bg-black/50 backdrop-blur text-amber-400 text-[10px] font-bold px-2.5 py-1 rounded-full border border-amber-500/30">
-                                            ★ {(temple.reviews.reduce((s, r) => s + r.rating, 0) / temple.reviews.length).toFixed(1)} ({temple.reviews.length})
-                                        </span>
-                                    )}
 
                                     <span className="absolute bottom-3 left-3 text-xs font-bold text-amber-200 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full uppercase tracking-widest border border-white/20">
                                         {temple.state || 'India'}

@@ -10,13 +10,8 @@ const TempleDetails = () => {
     
     const [temple, setTemple] = useState(null);
     const [loading, setLoading] = useState(true);
-
-    // Review Form State
-    const [rating, setRating] = useState(5);
-    const [comment, setComment] = useState('');
-    const [reviewMessage, setReviewMessage] = useState('');
-    const [reviewError, setReviewError] = useState('');
-    const [reviewLoading, setReviewLoading] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
+    const [saveLoading, setSaveLoading] = useState(false);
 
     const fetchSingleTemple = async () => {
         try {
@@ -29,33 +24,63 @@ const TempleDetails = () => {
         }
     };
 
-    useEffect(() => {
-        fetchSingleTemple();
-    }, [id]);
-
-    const submitReview = async (e) => {
-        e.preventDefault();
-        setReviewLoading(true);
-        setReviewMessage('');
-        setReviewError('');
+    const checkSavedStatus = async () => {
+        if (!user) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.post(
-                `http://localhost:5000/api/temple-data/${id}/reviews`, 
-                { rating, comment },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            setReviewMessage('Review added successfully! 🎉');
-            setComment('');
-            setRating(5);
-            fetchSingleTemple(); // Refresh to show new review
+            const res = await axios.get('http://localhost:5000/api/auth/saved-temples', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const savedTemples = res.data.data || [];
+            setIsSaved(savedTemples.some(t => t._id === id || t === id));
         } catch (err) {
-            setReviewError(err.response?.data?.message || 'Failed to submit review');
-        } finally {
-            setReviewLoading(false);
+            console.error("Failed to check saved status");
         }
     };
 
+    useEffect(() => {
+        fetchSingleTemple();
+        checkSavedStatus();
+    }, [id, user]);
+
+    const handleShare = () => {
+        if (navigator.share) {
+            navigator.share({
+                title: temple?.templeName,
+                text: `Check out ${temple?.templeName} on India Temple Heritage Portal!`,
+                url: window.location.href,
+            }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Link copied to clipboard!");
+        }
+    };
+
+    const toggleSave = async () => {
+        if (!user) {
+            navigate('/login');
+            return;
+        }
+        setSaveLoading(true);
+        try {
+            const token = localStorage.getItem('token');
+            if (isSaved) {
+                await axios.delete(`http://localhost:5000/api/auth/save-temple/${id}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setIsSaved(false);
+            } else {
+                await axios.post(`http://localhost:5000/api/auth/save-temple/${id}`, {}, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setIsSaved(true);
+            }
+        } catch (err) {
+            console.error("Failed to toggle save", err);
+        } finally {
+            setSaveLoading(false);
+        }
+    };
     if (loading) return (
         <div className="min-h-screen bg-slate-900 flex justify-center items-center">
             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-orange-500"></div>
@@ -70,9 +95,7 @@ const TempleDetails = () => {
         </div>
     );
 
-    const avgRating = temple.reviews && temple.reviews.length > 0
-        ? (temple.reviews.reduce((sum, r) => sum + r.rating, 0) / temple.reviews.length).toFixed(1)
-        : null;
+
 
     return (
         <div className="min-h-screen bg-slate-900 pt-28 pb-20 px-4 font-sans">
@@ -96,11 +119,6 @@ const TempleDetails = () => {
                             <span className="bg-white/10 backdrop-blur text-slate-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-white/20">
                                 {temple.city}
                             </span>
-                            {avgRating && (
-                                <span className="bg-amber-500/20 backdrop-blur text-amber-400 text-xs font-bold px-3 py-1 rounded-full tracking-widest border border-amber-500/30">
-                                    ★ {avgRating} ({temple.reviews.length} reviews)
-                                </span>
-                            )}
                         </div>
                         <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight drop-shadow-xl">
                             {temple.templeName}
@@ -142,15 +160,26 @@ const TempleDetails = () => {
                             </div>
                             
                             <div className="bg-gradient-to-br from-white/5 to-transparent p-6 rounded-2xl border border-white/10 hover:border-orange-500/50 transition-colors">
-                                <h4 className="text-lg font-bold text-white mb-3 flex items-center gap-2"><span>🏨</span> Facilities Nearby</h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {temple.nearbyFacilities?.length > 0 ? (
-                                        temple.nearbyFacilities.map((fac, i) => (
-                                            <span key={i} className="text-xs font-semibold bg-orange-900/30 text-orange-200 border border-orange-500/30 px-3 py-1.5 rounded-full">{fac}</span>
-                                        ))
-                                    ) : (
-                                        <span className="text-slate-400 text-sm italic">Not specified</span>
-                                    )}
+                                <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight drop-shadow-xl mb-4">{temple.templeName}</h1>
+                                
+                                <div className="flex gap-4 mt-6">
+                                    <button 
+                                        disabled={saveLoading}
+                                        className={`px-6 py-2.5 backdrop-blur font-bold rounded-xl border transition-all shadow-lg flex items-center gap-2 ${
+                                            isSaved 
+                                            ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
+                                            : 'bg-white/20 hover:bg-white/30 text-white border-white/30'
+                                        }`}
+                                        onClick={toggleSave}
+                                    >
+                                        {isSaved ? '🔖 Saved' : '🔖 Save'}
+                                    </button>
+                                    <button 
+                                        onClick={handleShare}
+                                        className="px-6 py-2.5 bg-black/40 hover:bg-black/60 backdrop-blur text-white font-bold rounded-xl border border-white/20 transition-all shadow-lg flex items-center gap-2"
+                                    >
+                                        🔗 Share
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -167,98 +196,7 @@ const TempleDetails = () => {
                             </div>
                         )}
 
-                        {/* COMMUNITY REVIEWS SECTION */}
-                        <div className="mt-12 pt-12 border-t border-white/10">
-                            <h3 className="text-3xl font-extrabold text-white mb-8 tracking-wide">
-                                Community Reviews
-                                {temple.reviews && temple.reviews.length > 0 && (
-                                    <span className="ml-3 text-lg font-normal text-slate-400">({temple.reviews.length})</span>
-                                )}
-                            </h3>
 
-                            {/* REVIEW SUBMIT FORM */}
-                            {user ? (
-                                <form onSubmit={submitReview} className="bg-white/5 p-6 md:p-8 rounded-2xl border border-white/10 mb-10 shadow-lg">
-                                    <h4 className="text-lg font-bold text-orange-400 mb-6 uppercase tracking-widest">Share your experience</h4>
-                                    
-                                    {reviewMessage && <div className="mb-4 p-3 bg-green-500/20 text-green-400 border border-green-500/30 rounded-lg text-sm font-bold">{reviewMessage}</div>}
-                                    {reviewError && <div className="mb-4 p-3 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-sm font-bold">{reviewError}</div>}
-
-                                    <div className="mb-6">
-                                        <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Rating</label>
-                                        <select 
-                                            value={rating} 
-                                            onChange={(e) => setRating(Number(e.target.value))}
-                                            className="w-full md:w-48 px-4 py-3 bg-slate-900/80 border border-white/10 rounded-xl text-amber-400 font-bold focus:outline-none focus:border-orange-500/50"
-                                        >
-                                            <option value={5}>⭐⭐⭐⭐⭐ (5/5)</option>
-                                            <option value={4}>⭐⭐⭐⭐ (4/5)</option>
-                                            <option value={3}>⭐⭐⭐ (3/5)</option>
-                                            <option value={2}>⭐⭐ (2/5)</option>
-                                            <option value={1}>⭐ (1/5)</option>
-                                        </select>
-                                    </div>
-                                    <div className="mb-6">
-                                        <label className="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Your Thoughts</label>
-                                        <textarea 
-                                            value={comment}
-                                            onChange={(e) => setComment(e.target.value)}
-                                            required
-                                            rows="3"
-                                            placeholder="Write about the peace, architecture, or any tips for other devotees..."
-                                            className="w-full px-4 py-3 bg-slate-900/80 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-orange-500/50 resize-none"
-                                        ></textarea>
-                                    </div>
-                                    <button 
-                                        type="submit" 
-                                        disabled={reviewLoading}
-                                        className="px-8 py-3 bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(249,115,22,0.4)] tracking-wider transition-all disabled:opacity-50"
-                                    >
-                                        {reviewLoading ? 'Submitting...' : 'Post Review'}
-                                    </button>
-                                </form>
-                            ) : (
-                                <div className="bg-orange-900/20 p-8 rounded-2xl border border-orange-500/30 text-center mb-10">
-                                    <h4 className="text-xl font-bold text-white mb-3">Have you visited this shrine?</h4>
-                                    <p className="text-slate-400 mb-6">Please log in to share your spiritual experience with the community.</p>
-                                    <button 
-                                        onClick={() => navigate('/login')}
-                                        className="px-8 py-3 bg-white/10 hover:bg-orange-500/20 border border-white/20 hover:border-orange-500/50 text-white font-bold rounded-xl transition-all"
-                                    >
-                                        Login to Review
-                                    </button>
-                                </div>
-                            )}
-
-                            {/* REVIEWS LIST */}
-                            <div className="space-y-6">
-                                {temple.reviews && temple.reviews.length > 0 ? (
-                                    [...temple.reviews].reverse().map((rev, index) => (
-                                        <div key={index} className="bg-slate-900/50 p-6 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
-                                            <div className="flex justify-between items-start mb-3">
-                                                <div>
-                                                    <h5 className="font-bold text-white text-lg capitalize">{rev.name}</h5>
-                                                    <span className="text-xs text-slate-500 uppercase tracking-widest">
-                                                        {new Date(rev.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-                                                    </span>
-                                                </div>
-                                                <div className="bg-amber-500/10 px-3 py-1 rounded-lg border border-amber-500/20">
-                                                    <span className="text-amber-400 font-bold">
-                                                        {"★".repeat(rev.rating)}{"☆".repeat(5 - rev.rating)}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <p className="text-slate-300 italic leading-relaxed">"{rev.comment}"</p>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="text-center py-10">
-                                        <span className="text-4xl block mb-4 opacity-50">✍️</span>
-                                        <p className="text-slate-400">No reviews yet. Be the first to share your experience!</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
 
                     </div>
                 </div>

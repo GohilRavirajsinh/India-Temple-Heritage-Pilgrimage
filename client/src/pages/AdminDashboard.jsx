@@ -272,7 +272,6 @@ const AdminDashboard = () => {
                                                         <div className="flex-1 min-w-0">
                                                             <h4 className="font-bold text-white truncate">{temple.templeName} {temple.isFeatured && <span className="text-amber-400 text-xs">⭐</span>}</h4>
                                                             <p className="text-xs text-slate-400 uppercase tracking-widest">{temple.city}, {temple.state} · 🙏 {temple.deity}</p>
-                                                            <p className="text-xs text-slate-500 mt-1">{temple.reviews?.length || 0} reviews</p>
                                                         </div>
                                                         <div className="flex gap-2 mt-3 md:mt-0">
                                                             <button onClick={() => navigate(`/temples/${temple._id}`)} className="px-3 py-2 bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 rounded-lg text-xs font-bold transition-all">👁️ View</button>

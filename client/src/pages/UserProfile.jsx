@@ -15,34 +15,27 @@ const UserProfile = () => {
     const [pwError, setPwError] = useState('');
     const [pwLoading, setPwLoading] = useState(false);
 
-    // My reviews — fetched from temples
-    const [myReviews, setMyReviews] = useState([]);
-    const [reviewsLoading, setReviewsLoading] = useState(false);
+    // Saved Temples
+    const [savedTemples, setSavedTemples] = useState([]);
+    const [savedLoading, setSavedLoading] = useState(false);
 
     useEffect(() => {
         if (!user) { navigate('/login'); return; }
-        if (activeTab === 'reviews') fetchMyReviews();
+        if (activeTab === 'saved') fetchSavedTemples();
     }, [activeTab, user]);
 
-    const fetchMyReviews = async () => {
-        setReviewsLoading(true);
+    const fetchSavedTemples = async () => {
+        setSavedLoading(true);
         try {
-            const res = await axios.get('http://localhost:5000/api/temple-data/all');
-            const allTemples = res.data.data || [];
-            // Filter reviews made by current user (match by name since we store name)
-            const reviews = [];
-            allTemples.forEach(temple => {
-                (temple.reviews || []).forEach(review => {
-                    if (review.name?.toLowerCase() === user.name?.toLowerCase()) {
-                        reviews.push({ ...review, templeName: temple.templeName, templeId: temple._id });
-                    }
-                });
+            const token = localStorage.getItem('token');
+            const res = await axios.get('http://localhost:5000/api/auth/saved-temples', {
+                headers: { Authorization: `Bearer ${token}` }
             });
-            setMyReviews(reviews.reverse());
+            setSavedTemples(res.data.data || []);
         } catch (err) {
-            console.error('Failed to fetch reviews');
+            console.error('Failed to fetch saved temples');
         } finally {
-            setReviewsLoading(false);
+            setSavedLoading(false);
         }
     };
 
@@ -71,7 +64,7 @@ const UserProfile = () => {
 
     const tabs = [
         { key: 'profile', label: '👤 Profile' },
-        { key: 'reviews', label: '⭐ My Reviews' },
+        { key: 'saved', label: '🔖 Saved Temples' },
         { key: 'security', label: '🔐 Security' },
     ];
 
@@ -143,36 +136,38 @@ const UserProfile = () => {
                             </div>
                         )}
 
-                        {/* ── TAB 2: MY REVIEWS ── */}
-                        {activeTab === 'reviews' && (
+                        {/* ── TAB 2: SAVED TEMPLES ── */}
+                        {activeTab === 'saved' && (
                             <div>
-                                <h3 className="text-lg font-bold text-white uppercase tracking-widest mb-6">My Reviews</h3>
-                                {reviewsLoading ? (
+                                <h3 className="text-lg font-bold text-white uppercase tracking-widest mb-6">Saved Temples</h3>
+                                {savedLoading ? (
                                     <div className="flex justify-center py-10">
                                         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-orange-500"></div>
                                     </div>
-                                ) : myReviews.length > 0 ? (
+                                ) : savedTemples.length > 0 ? (
                                     <div className="space-y-4">
-                                        {myReviews.map((review, i) => (
-                                            <div key={i} className="bg-slate-900/50 p-5 rounded-2xl border border-white/5 hover:border-white/10 transition-all">
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <button onClick={() => navigate(`/temples/${review.templeId}`)}
-                                                        className="font-bold text-orange-400 hover:text-orange-300 transition-colors text-left">
-                                                        🛕 {review.templeName}
-                                                    </button>
-                                                    <span className="text-amber-400 font-bold">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
+                                        {savedTemples.map((temple, i) => (
+                                            <div key={i} className="bg-slate-900/50 p-5 rounded-2xl border border-white/5 hover:border-orange-500/30 transition-all flex items-center justify-between">
+                                                <div className="flex items-center gap-4">
+                                                    <img 
+                                                        src={temple.imageUrl ? (temple.imageUrl.startsWith('http') ? temple.imageUrl : `http://localhost:5000${temple.imageUrl}`) : 'https://images.unsplash.com/photo-1623910271032-15f10b7f078e?w=100'} 
+                                                        className="w-16 h-16 rounded-xl object-cover" alt="" 
+                                                    />
+                                                    <div>
+                                                        <h4 className="font-bold text-white text-lg">{temple.templeName}</h4>
+                                                        <p className="text-slate-400 text-xs uppercase tracking-widest">{temple.city}, {temple.state}</p>
+                                                    </div>
                                                 </div>
-                                                <p className="text-slate-300 italic text-sm">"{review.comment}"</p>
-                                                <p className="text-slate-500 text-xs mt-2">
-                                                    {new Date(review.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-                                                </p>
+                                                <button onClick={() => navigate(`/temples/${temple._id}`)} className="px-4 py-2 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 font-bold border border-orange-500/30 rounded-xl text-sm transition-all">
+                                                    View →
+                                                </button>
                                             </div>
                                         ))}
                                     </div>
                                 ) : (
                                     <div className="text-center py-12">
-                                        <span className="text-5xl block mb-4 opacity-40">✍️</span>
-                                        <p className="text-slate-400 mb-4">You haven't reviewed any temples yet.</p>
+                                        <span className="text-5xl block mb-4 opacity-40">🔖</span>
+                                        <p className="text-slate-400 mb-4">You haven't saved any temples yet.</p>
                                         <button onClick={() => navigate('/temples')} className="px-6 py-2.5 bg-white/5 border border-white/10 hover:border-orange-500/30 text-white font-bold rounded-xl text-sm transition-all">
                                             Explore Temples
                                         </button>

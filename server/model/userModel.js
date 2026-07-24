@@ -20,9 +20,13 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['user', 'admin'], // Sirf in dono me se ek hi role ho sakta hai
-        default: 'user' // By default har naya banda normal user hoga
-    }
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
+    savedTemples: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Temple'
+    }]
 }, {
     timestamps: true
 })

@@ -15,6 +15,7 @@ import { AuthProvider } from './context/AuthContext'
 import TempleDetails from './pages/TempleDetails'
 import NotFound from './pages/NotFound'
 import UserProfile from './pages/UserProfile'
+import About from './pages/About'
 
 
 const router = createBrowserRouter([
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
       {
         path: '/profile',
         element: <UserProfile />
+      },
+      {
+        path: '/about',
+        element: <About />
       },
     ]
   },

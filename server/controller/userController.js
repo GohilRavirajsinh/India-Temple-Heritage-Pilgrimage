@@ -139,3 +139,49 @@ exports.deleteUsersByAdmin = async (req, res) => {
         res.status(500).json({ success:false, message:"User Deletion Failed", error: err.message});
     }
 }
+
+// Save Temple (POST /api/user/save-temple/:id)
+exports.saveTemple = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const templeId = req.params.id;
+        if (!user.savedTemples.includes(templeId)) {
+            user.savedTemples.push(templeId);
+            await user.save();
+        }
+
+        res.status(200).json({ success: true, message: "Temple saved successfully", savedTemples: user.savedTemples });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Failed to save temple", error: err.message });
+    }
+};
+
+// Unsave Temple (DELETE /api/user/save-temple/:id)
+exports.unsaveTemple = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const templeId = req.params.id;
+        user.savedTemples = user.savedTemples.filter(id => id.toString() !== templeId);
+        await user.save();
+
+        res.status(200).json({ success: true, message: "Temple removed from saved", savedTemples: user.savedTemples });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Failed to remove temple", error: err.message });
+    }
+};
+
+// Get Saved Temples (GET /api/user/saved-temples)
+exports.getSavedTemples = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId).populate('savedTemples');
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        res.status(200).json({ success: true, data: user.savedTemples });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Failed to fetch saved temples", error: err.message });
+    }
+};

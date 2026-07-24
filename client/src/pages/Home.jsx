@@ -8,24 +8,16 @@ const Home = () => {
     const { user } = useContext(AuthContext);
 
     const [featuredTemples, setFeaturedTemples] = useState([]);
-    const [stats, setStats] = useState({ total: 0, states: 0, reviews: 0 });
+    const [stats, setStats] = useState({ total: 0, states: 0, festivals: 0, cities: 0 });
     const [loadingFeatured, setLoadingFeatured] = useState(true);
 
-    const marqueeImages = [
-        "https://images.unsplash.com/photo-1514222020963-31fdf792878d?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1582510003544-4d00b7f7415e?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1602643163983-ed0babc39797?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1561359313-0639aad49ca6?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=800&q=80",
-    ];
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const res = await axios.get('http://localhost:5000/api/temple-data/all');
                 const allTemples = res.data.data || [];
-                
+
                 // Featured temples (isFeatured = true, max 3)
                 const featured = allTemples.filter(t => t.isFeatured).slice(0, 3);
                 // If less than 3 featured, fill with latest
@@ -36,10 +28,18 @@ const Home = () => {
                     setFeaturedTemples(featured);
                 }
 
-                // Stats
+                // Stats — sab kuch database se calculate hoga
                 const uniqueStates = [...new Set(allTemples.map(t => t.state).filter(Boolean))];
-                const totalReviews = allTemples.reduce((sum, t) => sum + (t.reviews?.length || 0), 0);
-                setStats({ total: allTemples.length, states: uniqueStates.length, reviews: totalReviews });
+                const uniqueCities = [...new Set(allTemples.map(t => t.city).filter(Boolean))];
+                // Har temple ke festivals array ko ek jagah ikatha karo, phir unique count karo
+                const allFestivals = allTemples.flatMap(t => t.festivals || []);
+                const uniqueFestivals = [...new Set(allFestivals.map(f => f.toLowerCase().trim()).filter(Boolean))];
+                setStats({
+                    total: allTemples.length,
+                    states: uniqueStates.length,
+                    festivals: uniqueFestivals.length,
+                    cities: uniqueCities.length,
+                });
             } catch (err) {
                 console.error('Failed to fetch temples', err);
             } finally {
@@ -49,11 +49,7 @@ const Home = () => {
         fetchData();
     }, []);
 
-    const howItWorks = [
-        { icon: '🔍', title: 'Search & Discover', desc: 'Search temples by name, state, city, or deity across all of India.' },
-        { icon: '📜', title: 'Explore Details', desc: 'Read history, darshan timings, dress code, rituals and nearby facilities.' },
-        { icon: '✍️', title: 'Share Experience', desc: 'Login and leave a review to help other devotees plan their visit.' },
-    ];
+
 
     return (
         <div className="min-h-screen bg-slate-900 overflow-hidden font-sans">
@@ -82,7 +78,7 @@ const Home = () => {
                     </h1>
 
                     <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-md mb-12">
-                        Explore historical shrines, accurate darshan timings, ancient history and community reviews — all in one divine portal.
+                        Explore historical shrines, accurate darshan timings, and ancient history — all in one divine portal.
                     </p>
 
                     <div className="flex flex-col sm:flex-row justify-center gap-5">
@@ -107,47 +103,6 @@ const Home = () => {
                 <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 text-slate-400 text-xs uppercase tracking-widest flex flex-col items-center gap-2 animate-bounce-slow">
                     <span>Scroll Down</span>
                     <span className="text-lg">↓</span>
-                </div>
-            </div>
-
-            {/* ─── STATS SECTION ─── */}
-            <div className="bg-gradient-to-r from-orange-600/10 via-amber-500/10 to-orange-600/10 border-y border-orange-500/20 py-10">
-                <div className="max-w-5xl mx-auto px-6 grid grid-cols-3 gap-4 text-center">
-                    {[
-                        { value: stats.total || '...', label: 'Temples Listed', icon: '🛕' },
-                        { value: stats.states || '...', label: 'States Covered', icon: '🗺️' },
-                        { value: stats.reviews || '...', label: 'Community Reviews', icon: '⭐' },
-                    ].map((stat, i) => (
-                        <div key={i} className="flex flex-col items-center gap-1">
-                            <span className="text-3xl">{stat.icon}</span>
-                            <span className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">
-                                {stat.value}+
-                            </span>
-                            <span className="text-slate-400 text-xs md:text-sm uppercase tracking-widest font-bold">{stat.label}</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* ─── MARQUEE IMAGE GALLERY ─── */}
-            <div className="w-full bg-slate-900 py-16 overflow-hidden border-b border-white/5">
-                <div className="text-center mb-10 px-4">
-                    <span className="text-orange-400 text-xs font-bold uppercase tracking-widest">Visual Journey</span>
-                    <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-wide mt-2">
-                        Glimpse of <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-200">Divinity</span>
-                    </h2>
-                </div>
-                <div className="animate-marquee flex gap-6 px-3">
-                    {[...marqueeImages, ...marqueeImages].map((img, index) => (
-                        <div key={index} className="flex-none w-64 h-44 md:w-80 md:h-52 rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/10 group cursor-pointer"
-                            onClick={() => navigate('/temples')}>
-                            <img
-                                src={img}
-                                alt="Temple"
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100"
-                            />
-                        </div>
-                    ))}
                 </div>
             </div>
 
@@ -226,29 +181,31 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* ─── HOW IT WORKS ─── */}
-            <div className="py-20 px-6 bg-white/[0.02] border-y border-white/5">
-                <div className="max-w-5xl mx-auto">
-                    <div className="text-center mb-14">
-                        <span className="text-orange-400 text-xs font-bold uppercase tracking-widest">Simple Steps</span>
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-wide mt-2">
-                            How It <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-200">Works</span>
-                        </h2>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {howItWorks.map((step, i) => (
-                            <div key={i} className="bg-white/5 backdrop-blur border border-white/10 hover:border-orange-500/30 rounded-2xl p-8 text-center transition-all hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(249,115,22,0.1)] group">
-                                <div className="text-5xl mb-5 animate-float" style={{ animationDelay: `${i * 0.5}s` }}>{step.icon}</div>
-                                <div className="w-7 h-7 rounded-full bg-orange-500/20 border border-orange-500/40 text-orange-400 text-xs font-extrabold flex items-center justify-center mx-auto mb-4">
-                                    {i + 1}
-                                </div>
-                                <h3 className="text-lg font-bold text-white mb-3 tracking-wide">{step.title}</h3>
-                                <p className="text-slate-400 text-sm leading-relaxed">{step.desc}</p>
+            {/* ─── STATS SECTION ─── */}
+            <div className="border-y border-white/10 py-10" style={{ backgroundColor: '#130C07' }}>
+                <div className="max-w-5xl mx-auto px-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/10">
+                        {[
+                            { value: stats.total || '0', label: 'Temples' },
+                            { value: stats.states || '0', label: 'States' },
+                            { value: stats.festivals || '0', label: 'Festivals' },
+                            { value: stats.cities || '0', label: 'Sacred Cities' },
+                        ].map((stat, i) => (
+                            <div key={i} className="flex flex-col items-center justify-center py-6 px-4 text-center">
+                                <span className="text-3xl md:text-5xl font-extrabold tracking-tight" style={{ color: '#C89030' }}>
+                                    {stat.value}+
+                                </span>
+                                <span className="mt-2 text-xs md:text-sm uppercase tracking-widest font-bold" style={{ color: '#6B5040' }}>
+                                    {stat.label}
+                                </span>
                             </div>
                         ))}
                     </div>
                 </div>
             </div>
+
+
+
 
             {/* ─── CTA SECTION ─── */}
             {!user && (
