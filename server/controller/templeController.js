@@ -6,8 +6,9 @@ const path = require('path');
 exports.addTemple = async (req, res) => {
     try {
         if (req.file) {
-            req.body.imageUrl = `/uploads/${req.file.filename}`;
+            req.body.imageUrl = req.file.path; // Cloudinary seedha Live Link dega
         }
+
 
         // req.body me wo data aayega jo admin form me bharega!
         const newTemple = new Temple(req.body);
@@ -109,10 +110,11 @@ exports.searchTemples = async (req, res) => {
 exports.updateTemple = async (req, res) => {
     try {
         if (req.file) {
-            req.body.imageUrl = `/uploads/${req.file.filename}`;
+            req.body.imageUrl = req.file.path;
         } else {
             delete req.body.imageUrl;
         }
+
 
         const updatedTemple = await Temple.findByIdAndUpdate(
             req.params.id,
@@ -163,11 +165,11 @@ exports.deleteTemple = async (req, res) => {
 exports.getSingleTemple = async (req, res) => {
     try {
         const temple = await Temple.findById(req.params.id);
-        
+
         if (!temple) {
             return res.status(404).json({ success: false, message: "Temple not found" });
         }
-        
+
         res.status(200).json({
             success: true,
             data: temple
@@ -180,4 +182,4 @@ exports.getSingleTemple = async (req, res) => {
         });
     }
 };
-
+
