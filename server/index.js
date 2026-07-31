@@ -3,7 +3,7 @@ const express = require('express');
 const dbConnection = require('./config/db');
 const cors = require('cors');
 require('dotenv').config(); 
-const path = require('path');
+
 
 const templeRoutes = require('./routes/templeRoutes');
 
@@ -14,8 +14,7 @@ const app = express();
 app.use(cors()); 
 app.use(express.json()); 
 
-// Static folder configuration (hamesha routes se pehle)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // Pillar 3: Routing Middleware (Hamesha listen se PEHLE aane chahiye)
 app.use('/api/temple-data', templeRoutes);

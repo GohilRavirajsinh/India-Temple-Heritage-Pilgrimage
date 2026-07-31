@@ -1,6 +1,4 @@
 const Temple = require('../model/templeModul') // model import
-const fs = require('fs');
-const path = require('path');
 
 // Nya Function Add Krne ka Function (For Admin)
 exports.addTemple = async (req, res) => {
@@ -146,13 +144,7 @@ exports.deleteTemple = async (req, res) => {
         }
 
         // Delete Image from file system if it exists
-        if (pickTemple.imageUrl) {
-            const imagePath = path.join(__dirname, '..', pickTemple.imageUrl);
-            // Check if file exists then delete
-            if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
-            }
-        }
+        // (Note: Since we use Cloudinary now, local file deletion is skipped)
 
         await Temple.findByIdAndDelete(req.params.id);
 
