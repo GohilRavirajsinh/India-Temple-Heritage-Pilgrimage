@@ -6,7 +6,7 @@ require('dotenv').config();
 const path = require('path');
 
 const templeRoutes = require('./routes/templeRoutes');
-const reviewRoutes = require('./routes/reviewRoutes');
+
 const userRoutes = require('./routes/userRoutes');
 
 // pillar 2: App Initialize aur Middlewares
@@ -19,7 +19,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Pillar 3: Routing Middleware (Hamesha listen se PEHLE aane chahiye)
 app.use('/api/temple-data', templeRoutes);
-app.use('/api/reviews', reviewRoutes);
+
 app.use('/api/auth', userRoutes);
 
 // Test Route
