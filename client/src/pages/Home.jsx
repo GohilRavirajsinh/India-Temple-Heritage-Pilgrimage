@@ -15,7 +15,7 @@ const Home = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/temple-data/all');
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/temple-data/all`);
                 const allTemples = res.data.data || [];
 
                 // Featured temples (isFeatured = true, max 3)
@@ -135,7 +135,7 @@ const Home = () => {
                                 >
                                     <img
                                         src={temple.imageUrl
-                                            ? (temple.imageUrl.startsWith('http') ? temple.imageUrl : `http://localhost:5000${temple.imageUrl}`)
+                                            ? (temple.imageUrl.startsWith('http') ? temple.imageUrl : `${import.meta.env.VITE_API_URL}${temple.imageUrl}`)
                                             : 'https://images.unsplash.com/photo-1602643163983-ed0babc39797?w=800'}
                                         onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1623910271032-15f10b7f078e?w=800'; }}
                                         alt={temple.templeName}

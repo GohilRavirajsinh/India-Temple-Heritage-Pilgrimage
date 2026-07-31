@@ -28,7 +28,7 @@ const UserProfile = () => {
         setSavedLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/api/auth/saved-temples', {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/saved-temples`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setSavedTemples(res.data.data || []);
@@ -47,7 +47,7 @@ const UserProfile = () => {
         setPwLoading(true); setPwMsg(''); setPwError('');
         try {
             const token = localStorage.getItem('token');
-            await axios.put('http://localhost:5000/api/auth/update-password',
+            await axios.put(`${import.meta.env.VITE_API_URL}/api/auth/update-password`,
                 { currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -150,7 +150,7 @@ const UserProfile = () => {
                                             <div key={i} className="bg-slate-900/50 p-5 rounded-2xl border border-white/5 hover:border-orange-500/30 transition-all flex items-center justify-between">
                                                 <div className="flex items-center gap-4">
                                                     <img 
-                                                        src={temple.imageUrl ? (temple.imageUrl.startsWith('http') ? temple.imageUrl : `http://localhost:5000${temple.imageUrl}`) : 'https://images.unsplash.com/photo-1623910271032-15f10b7f078e?w=100'} 
+                                                        src={temple.imageUrl ? (temple.imageUrl.startsWith('http') ? temple.imageUrl : `${import.meta.env.VITE_API_URL}${temple.imageUrl}`) : 'https://images.unsplash.com/photo-1623910271032-15f10b7f078e?w=100'} 
                                                         className="w-16 h-16 rounded-xl object-cover" alt="" 
                                                     />
                                                     <div>

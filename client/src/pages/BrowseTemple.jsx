@@ -20,7 +20,7 @@ const BrowseTemple = () => {
         try {
             setLoading(true);
             setError('');
-            const res = await axios.get('http://localhost:5000/api/temple-data/all');
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/temple-data/all`);
             const data = res.data?.data || [];
             setTemples(data);
             setTotalCount(data.length);
@@ -42,7 +42,7 @@ const BrowseTemple = () => {
             setLoading(true);
             setError('');
             setActiveState('All');
-            const res = await axios.get(`http://localhost:5000/api/temple-data/search?query=${searchQuery}`);
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/temple-data/search?query=${searchQuery}`);
             const data = res.data.data || [];
             setTemples(data);
             if (data.length === 0) setError('No temples found matching your search!');
@@ -60,7 +60,7 @@ const BrowseTemple = () => {
         try {
             setLoading(true);
             setError('');
-            const res = await axios.get(`http://localhost:5000/api/temple-data/search?state=${state}`);
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/temple-data/search?state=${state}`);
             const data = res.data.data || [];
             setTemples(data);
             if (data.length === 0) setError(`No temples found in ${state}.`);
@@ -153,7 +153,7 @@ const BrowseTemple = () => {
                                 <div className="overflow-hidden relative h-56 w-full">
                                     <img
                                         src={temple.imageUrl
-                                            ? (temple.imageUrl.startsWith('http') ? temple.imageUrl : `http://localhost:5000${temple.imageUrl}`)
+                                            ? (temple.imageUrl.startsWith('http') ? temple.imageUrl : `${import.meta.env.VITE_API_URL}${temple.imageUrl}`)
                                             : 'https://images.unsplash.com/photo-1602643163983-ed0babc39797?w=800'}
                                         onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1623910271032-15f10b7f078e?auto=format&fit=crop&q=80&w=800'; }}
                                         alt={temple.templeName}

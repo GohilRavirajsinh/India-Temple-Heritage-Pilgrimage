@@ -26,7 +26,7 @@ const AdminDashboard = () => {
 
     const fetchTemples = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/temple-data/all');
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/temple-data/all`);
             setTemples(res.data.data || []);
         } catch (err) {
             console.error("Failed to fetch temples");
@@ -36,7 +36,7 @@ const AdminDashboard = () => {
     const fetchUsers = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/api/auth/all-users', {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/all-users`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setUsers(res.data.data || []);
@@ -54,7 +54,7 @@ const AdminDashboard = () => {
         if (!window.confirm("Delete this temple? This cannot be undone.")) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:5000/api/temple-data/${id}`, {
+            await axios.delete(`${import.meta.env.VITE_API_URL}/api/temple-data/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setTemples(temples.filter(temple => temple._id !== id));
@@ -69,7 +69,7 @@ const AdminDashboard = () => {
         if (!window.confirm("Delete this user? This cannot be undone.")) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:5000/api/auth/delete-users/${id}`, {
+            await axios.delete(`${import.meta.env.VITE_API_URL}/api/auth/delete-users/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setUsers(users.filter(u => u._id !== id));
@@ -111,7 +111,7 @@ const AdminDashboard = () => {
             dataToSubmit.append('isFeatured', formData.isFeatured);
             if (formData.imageUrl) dataToSubmit.append('imageUrl', formData.imageUrl);
 
-            await axios.post('http://localhost:5000/api/temple-data/add', dataToSubmit, {
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/temple-data/add`, dataToSubmit, {
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
             });
 
@@ -166,7 +166,7 @@ const AdminDashboard = () => {
                     dataToSubmit.append(key, editForm[key]);
                 }
             });
-            await axios.put(`http://localhost:5000/api/temple-data/${id}`, dataToSubmit, {
+            await axios.put(`${import.meta.env.VITE_API_URL}/api/temple-data/${id}`, dataToSubmit, {
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
             });
             setMessage('Temple updated successfully!');
@@ -265,7 +265,7 @@ const AdminDashboard = () => {
                                                 {editingTemple !== temple._id ? (
                                                     <div className="flex flex-col md:flex-row items-center gap-4 p-4">
                                                         <img
-                                                            src={temple.imageUrl ? (temple.imageUrl.startsWith('http') ? temple.imageUrl : `http://localhost:5000${temple.imageUrl}`) : 'https://images.unsplash.com/photo-1623910271032-15f10b7f078e?w=100'}
+                                                            src={temple.imageUrl ? (temple.imageUrl.startsWith('http') ? temple.imageUrl : `${import.meta.env.VITE_API_URL}${temple.imageUrl}`) : 'https://images.unsplash.com/photo-1623910271032-15f10b7f078e?w=100'}
                                                             onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1623910271032-15f10b7f078e?w=100'; }}
                                                             className="w-16 h-16 object-cover rounded-xl border border-white/10 flex-shrink-0" alt={temple.templeName}
                                                         />

@@ -15,7 +15,7 @@ const TempleDetails = () => {
 
     const fetchSingleTemple = async () => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/temple-data/${id}`);
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/temple-data/${id}`);
             setTemple(res.data.data);
             setLoading(false);
         } catch (error) {
@@ -28,7 +28,7 @@ const TempleDetails = () => {
         if (!user) return;
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/api/auth/saved-temples', {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/saved-temples`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const savedTemples = res.data.data || [];
@@ -65,12 +65,12 @@ const TempleDetails = () => {
         try {
             const token = localStorage.getItem('token');
             if (isSaved) {
-                await axios.delete(`http://localhost:5000/api/auth/save-temple/${id}`, {
+                await axios.delete(`${import.meta.env.VITE_API_URL}/api/auth/save-temple/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setIsSaved(false);
             } else {
-                await axios.post(`http://localhost:5000/api/auth/save-temple/${id}`, {}, {
+                await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/save-temple/${id}`, {}, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setIsSaved(true);
@@ -104,7 +104,7 @@ const TempleDetails = () => {
                 {/* Hero Image Section */}
                 <div className="relative h-96 w-full">
                     <img 
-                        src={temple.imageUrl ? (temple.imageUrl.startsWith('http') ? temple.imageUrl : `http://localhost:5000${temple.imageUrl}`) : 'https://images.unsplash.com/photo-1602643163983-ed0babc39797?w=1200'} 
+                        src={temple.imageUrl ? (temple.imageUrl.startsWith('http') ? temple.imageUrl : `${import.meta.env.VITE_API_URL}${temple.imageUrl}`) : 'https://images.unsplash.com/photo-1602643163983-ed0babc39797?w=1200'} 
                         alt={temple.templeName}
                         onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1623910271032-15f10b7f078e?auto=format&fit=crop&q=80&w=1200'; }}
                         className="w-full h-full object-cover"
