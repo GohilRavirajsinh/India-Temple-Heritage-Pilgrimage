@@ -105,7 +105,7 @@ const Navbar = () => {
                         {/* CHANGED: User greeting now uses heritage text colors */}
                         {/* ADDED: Avatar circle showing user's first initial, clicking opens /profile */}
                         <button onClick={() => navigate('/profile')}
-                            className="hidden sm:flex items-center gap-3 hover:opacity-80 transition-opacity group">
+                            className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity group">
 
                             {/*
                               ADDED: Avatar circle.
@@ -121,8 +121,8 @@ const Navbar = () => {
                                 {(user.name || user.role || '?').charAt(0)}
                             </div>
 
-                            {/* Welcome text alongside avatar */}
-                            <div className="flex flex-col text-left">
+                            {/* Welcome text alongside avatar (hidden on mobile to save space) */}
+                            <div className="hidden sm:flex flex-col text-left">
                                 <span className="text-xs text-slate-400 uppercase tracking-widest">Welcome,</span>
                                 <span className="text-sm font-bold text-amber-200 capitalize">{user.name || user.role}</span>
                             </div>
@@ -139,10 +139,10 @@ const Navbar = () => {
                 ) : (
                     // 🌟 GUEST USER (LOGGED OUT) KE LIYE UI 🌟
                     <div className="flex items-center gap-3 md:gap-4">
-                        {/* CHANGED: Login is a clean text link in maroon */}
+                        {/* CHANGED: Login is a clean text link (visible on mobile) */}
                         <button
                             onClick={() => navigate('/login')}
-                            className="px-4 py-2 text-sm font-semibold text-[#7B1E3A] hover:text-[#9A2448] transition-colors uppercase tracking-wider hidden sm:block"
+                            className="px-2 sm:px-4 py-2 text-sm font-semibold text-slate-300 hover:text-white transition-colors uppercase tracking-wider block"
                         >
                             Login
                         </button>
