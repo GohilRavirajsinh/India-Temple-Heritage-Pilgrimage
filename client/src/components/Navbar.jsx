@@ -34,7 +34,7 @@ const Navbar = () => {
             {/* Top Bar (Always visible) */}
             <div className="flex justify-between items-center w-full">
                 
-                {/* Left Side: Logo + Profile */}
+                {/* Left Side: Logo */}
                 <div className="flex items-center gap-3 sm:gap-4">
                     {/* Logo & Title */}
                     <div
@@ -49,25 +49,25 @@ const Navbar = () => {
                             Temple <span className="hidden sm:inline">Heritage</span>
                         </h2>
                     </div>
+                </div>
 
-                    {/* Mobile Profile Avatar & Name (Left side only on Mobile) */}
+                {/* Right Side: Profile (Mobile) + Hamburger + Desktop Links */}
+                <div className="flex items-center gap-3 sm:gap-4 md:gap-7">
+                    
+                    {/* Mobile Profile Avatar & Name (Right side only on Mobile) */}
                     {user && (
                         <button onClick={() => navigate('/profile')}
-                            className="flex md:hidden items-center gap-2 hover:opacity-80 transition-opacity pl-2 sm:pl-4 border-l border-white/10">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase bg-[#7B1E3A] text-[#F5E6B8] ring-1 ring-[#C89030] shadow-md flex-shrink-0">
-                                {(user.name || user.role || '?').charAt(0)}
-                            </div>
-                            <div className="flex flex-col text-left hidden min-[350px]:flex">
+                            className="flex md:hidden items-center gap-2 hover:opacity-80 transition-opacity pr-2 sm:pr-4 border-r border-white/10">
+                            <div className="flex flex-col text-right hidden min-[350px]:flex">
                                 <span className="text-[9px] text-slate-400 uppercase tracking-widest leading-tight">Welcome</span>
                                 <span className="text-xs font-bold text-amber-200 capitalize leading-tight">{user.name || user.role}</span>
                             </div>
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase bg-[#7B1E3A] text-[#F5E6B8] ring-1 ring-[#C89030] shadow-md flex-shrink-0">
+                                {(user.name || user.role || '?').charAt(0)}
+                            </div>
                         </button>
                     )}
-                </div>
 
-                {/* Right Side: Desktop Links & Mobile Hamburger */}
-                <div className="flex items-center gap-4 md:gap-7">
-                    
                     {/* Hamburger Icon (Mobile Only) */}
                     <button 
                         className="md:hidden text-2xl text-slate-200 hover:text-orange-400 transition-colors focus:outline-none"
