@@ -2,17 +2,13 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const INDIAN_STATES = [
-    'Gujarat', 'Uttar Pradesh', 'Rajasthan', 'Maharashtra',
-    'Karnataka', 'Odisha', 'Uttarakhand', 'Himachal Pradesh'
-];
-
 const BrowseTemple = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [temples, setTemples] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [activeState, setActiveState] = useState('All');
+    const [availableStates, setAvailableStates] = useState([]);
     const [totalCount, setTotalCount] = useState(0);
     const navigate = useNavigate();
 
@@ -24,6 +20,10 @@ const BrowseTemple = () => {
             const data = res.data?.data || [];
             setTemples(data);
             setTotalCount(data.length);
+            
+            // Extract unique states from all temples
+            const uniqueStates = [...new Set(data.map(t => t.state).filter(Boolean))].sort();
+            setAvailableStates(uniqueStates);
         } catch (err) {
             setError('Failed to fetch temple data');
         } finally {
@@ -111,7 +111,7 @@ const BrowseTemple = () => {
 
                 {/* State Filter Chips */}
                 <div className="flex flex-wrap gap-2 justify-center mb-10">
-                    {INDIAN_STATES.map((state) => (
+                    {availableStates.map((state) => (
                         <button
                             key={state}
                             onClick={() => handleStateFilter(state)}
